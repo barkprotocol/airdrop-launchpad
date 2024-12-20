@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { endpoints } from '@/api/endpoints';
+import { endpoints } from './data';
 
 export async function GET() {
   try {
@@ -9,3 +9,4 @@ export async function GET() {
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
+
