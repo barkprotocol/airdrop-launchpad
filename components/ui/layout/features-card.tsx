@@ -9,36 +9,36 @@ interface FeatureCardsProps {
 const features = [
   {
     icon: <Shield className="w-8 h-8" />,
-    title: "Secure",
-    description: "Built on Solana's robust blockchain, ensuring top-notch security for all transactions."
+    title: "Enhanced Security",
+    description: "Leverage Solana's secure blockchain infrastructure for all your transactions."
   },
   {
     icon: <Zap className="w-8 h-8" />,
-    title: "Fast",
-    description: "Lightning-fast transactions and minimal fees, powered by Solana's high-performance network."
+    title: "Unmatched Speed",
+    description: "Enjoy near-instant transaction processing with Solana's ultra-fast network."
   },
   {
     icon: <Users className="w-8 h-8" />,
-    title: "Community-Driven",
-    description: "Governed by the community, ensuring fair distribution and collective decision-making."
+    title: "Empowered Community",
+    description: "Join a protocol driven by its community, with fair rewards and shared governance."
   }
 ];
 
 const benefits = [
   {
     icon: <Gift className="w-8 h-8" />,
-    title: "Exclusive Rewards",
-    description: "Access to special airdrops, events, and early project participation opportunities."
+    title: "Exclusive Airdrops",
+    description: "Receive unique rewards and early access to BARK Protocol initiatives."
   },
   {
     icon: <Coins className="w-8 h-8" />,
-    title: "Staking Incentives",
-    description: "Earn additional rewards by staking your BARK tokens in the protocol."
+    title: "Earn While Staking",
+    description: "Maximize your gains by staking BARK tokens for additional incentives."
   },
   {
     icon: <ChartBar className="w-8 h-8" />,
-    title: "Governance Power",
-    description: "Participate in shaping the future of BARK Protocol through voting rights."
+    title: "Shape the Future",
+    description: "Use your governance power to vote on proposals and drive the protocol forward."
   }
 ];
 
@@ -49,19 +49,23 @@ export function FeatureCards({ backgroundImage, backgroundColor = 'black' }: Fea
 
   return (
     <div className="relative py-24 px-4 sm:px-6 lg:px-8 overflow-hidden" style={backgroundStyle}>
-      <div className="absolute inset-0 bg-black bg-opacity-60"></div>
+      <div className="absolute inset-0 bg-black bg-opacity-80"></div>
       <div className="relative max-w-7xl mx-auto">
+        {/* Features Section */}
         <div className="text-center mb-16">
           <h2 className="text-4xl font-extrabold text-white mb-4">
-            Why Choose BARK
+            Why Check Eligibility?
           </h2>
           <p className="text-xl text-[#D0C8B9]">
-            Discover the unique features that set BARK Token apart
+            Discover the key advantages of being part of the BARK Protocol
           </p>
         </div>
         <div className="grid gap-8 md:grid-cols-3 mb-24">
           {features.map((feature, index) => (
-            <div key={index} className="bg-white bg-opacity-5 backdrop-filter backdrop-blur-sm rounded-xl p-8 border border-[#D0C8B9] border-opacity-20 transition-transform duration-300 ease-in-out transform hover:scale-105">
+            <div
+              key={index}
+              className="bg-white bg-opacity-5 backdrop-filter backdrop-blur-sm rounded-xl p-8 border border-[#D0C8B9] border-opacity-20 transition-transform duration-300 ease-in-out transform hover:scale-105"
+            >
               <div className="flex items-center justify-center w-16 h-16 rounded-full bg-[#D0C8B9] text-black mb-6 mx-auto">
                 {feature.icon}
               </div>
@@ -70,17 +74,21 @@ export function FeatureCards({ backgroundImage, backgroundColor = 'black' }: Fea
             </div>
           ))}
         </div>
+        {/* Benefits Section */}
         <div className="text-center mb-16">
           <h2 className="text-4xl font-extrabold text-white mb-4">
-            Benefits to Join BARK Protocol
+            Benefits of Joining BARK
           </h2>
           <p className="text-xl text-[#D0C8B9]">
-            Unlock these exclusive advantages by becoming part of our community
+            Unlock exclusive perks and opportunities with BARK Protocol
           </p>
         </div>
         <div className="grid gap-8 md:grid-cols-3">
           {benefits.map((benefit, index) => (
-            <div key={index} className="bg-white bg-opacity-5 backdrop-filter backdrop-blur-sm rounded-xl p-8 border border-[#D0C8B9] border-opacity-20 transition-transform duration-300 ease-in-out transform hover:scale-105">
+            <div
+              key={index}
+              className="bg-white bg-opacity-5 backdrop-filter backdrop-blur-sm rounded-xl p-8 border border-[#D0C8B9] border-opacity-20 transition-transform duration-300 ease-in-out transform hover:scale-105"
+            >
               <div className="flex items-center justify-center w-16 h-16 rounded-full bg-[#D0C8B9] text-black mb-6 mx-auto">
                 {benefit.icon}
               </div>
@@ -93,4 +101,3 @@ export function FeatureCards({ backgroundImage, backgroundColor = 'black' }: Fea
     </div>
   );
 }
-

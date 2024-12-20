@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { useWallet } from '@solana/wallet-adapter-react'
 import { Button } from "@/components/ui/button"
 import { Loader2, Wallet } from 'lucide-react'
@@ -11,46 +11,68 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { cn } from "@/lib/utils"
+import { toast } from 'react-hot-toast'
 
 export function WalletButton() {
   const { publicKey, wallet, disconnect, select, wallets, connecting } = useWallet()
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const buttonClasses = cn(
     "bg-white text-black",
     "border border-gray-700 dark:border-gray-200",
-    "hover:bg-gray-800 hover:bg-gray-800",
-    "py-4 px-4",
+    "hover:bg-gray-100 dark:hover:bg-gray-800",
+    "py-2 px-4",
     "text-sm font-semibold",
     "transition-colors duration-200"
   )
 
-  const handleDisconnect = useCallback(() => {
-    disconnect()
-    setIsDropdownOpen(false)
+  const handleDisconnect = useCallback(async () => {
+    try {
+      await disconnect()
+      setIsDropdownOpen(false)
+      toast.success('Wallet disconnected')
+    } catch (error) {
+      console.error('Error disconnecting wallet:', error)
+      toast.error('Failed to disconnect wallet')
+    }
   }, [disconnect])
+
+  const handleSelect = useCallback(async (walletName: string) => {
+    try {
+      await select(walletName)
+      setIsDropdownOpen(false)
+    } catch (error) {
+      console.error('Error selecting wallet:', error)
+      toast.error('Failed to select wallet')
+    }
+  }, [select])
 
   const renderConnectedState = () => (
     <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="lg" className={buttonClasses}>
-          <Wallet className="h-5 w-5 mr-2" />
+        <Button variant="outline" className={buttonClasses}>
+          <Wallet className="h-4 w-4 mr-2" />
           <span className="text-sm font-semibold">
             {publicKey?.toBase58().slice(0, 4)}...{publicKey?.toBase58().slice(-4)}
           </span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-58 bg-background/80 backdrop-blur-sm">
-        <DropdownMenuItem onClick={handleDisconnect}>Disconnect</DropdownMenuItem>
+        <DropdownMenuItem onSelect={handleDisconnect}>Disconnect</DropdownMenuItem>
         <DropdownMenuItem>
-          {publicKey?.toBase58()}
+          <span className="text-xs">{publicKey?.toBase58()}</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   )
 
   const renderConnectingState = () => (
-    <Button variant="outline" size="lg" className={buttonClasses}>
+    <Button variant="outline" className={buttonClasses} disabled>
       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
       <span className="text-sm font-medium">Connecting</span>
     </Button>
@@ -59,7 +81,7 @@ export function WalletButton() {
   const renderDisconnectedState = () => (
     <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="lg" className={buttonClasses}>
+        <Button variant="outline" className={buttonClasses}>
           <Wallet className="h-4 w-4 mr-2" />
           <span className="text-sm font-medium">Connect</span>
         </Button>
@@ -68,10 +90,7 @@ export function WalletButton() {
         {wallets.map((wallet) => (
           <DropdownMenuItem
             key={wallet.adapter.name}
-            onClick={() => {
-              select(wallet.adapter.name)
-              setIsDropdownOpen(false)
-            }}
+            onSelect={() => handleSelect(wallet.adapter.name)}
           >
             {wallet.adapter.name}
           </DropdownMenuItem>
@@ -80,7 +99,12 @@ export function WalletButton() {
     </DropdownMenu>
   )
 
+  if (!mounted) {
+    return null
+  }
+
   if (publicKey) return renderConnectedState()
   if (connecting) return renderConnectingState()
   return renderDisconnectedState()
 }
+

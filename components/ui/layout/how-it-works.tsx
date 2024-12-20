@@ -26,13 +26,28 @@ const steps = [
 
 export function HowItWorks({ backgroundImage, backgroundColor = 'black' }: HowItWorksProps) {
   const backgroundStyle = backgroundImage
-    ? { backgroundImage: `url(${backgroundImage})`, backgroundSize: 'cover', backgroundPosition: 'center' }
+    ? {
+        backgroundImage: `url(${backgroundImage})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        transform: 'rotate(2deg)', // Subtle rotation
+        transformOrigin: 'center', // Keeps the rotation centered
+      }
     : { backgroundColor };
 
   return (
-    <div className="relative py-24 px-4 sm:px-6 lg:px-8 overflow-hidden" style={backgroundStyle}>
-      <div className="absolute inset-0 bg-black bg-opacity-60"></div>
+    <div className="relative py-24 px-4 sm:px-6 lg:px-8 overflow-hidden" style={{ position: 'relative' }}>
+      {/* Background Layer */}
+      <div
+        className="absolute inset-0"
+        style={{
+          ...backgroundStyle,
+          zIndex: -1,
+          filter: 'brightness(0.5) contrast(1.2)', // Adjusts visibility
+        }}
+      ></div>
       <div className="relative max-w-7xl mx-auto">
+        {/* Title and Description */}
         <div className="text-center mb-16">
           <h2 className="text-4xl font-extrabold text-white mb-4">
             How It Works
@@ -41,9 +56,13 @@ export function HowItWorks({ backgroundImage, backgroundColor = 'black' }: HowIt
             Follow these simple steps to claim your BARK tokens
           </p>
         </div>
+        {/* Steps Grid */}
         <div className="grid gap-8 md:grid-cols-3">
           {steps.map((step, index) => (
-            <div key={index} className="bg-white bg-opacity-5 backdrop-filter backdrop-blur-sm rounded-xl p-8 border border-[#D0C8B9] border-opacity-20 transition-transform duration-300 ease-in-out transform hover:scale-105">
+            <div
+              key={index}
+              className="bg-white bg-opacity-5 backdrop-filter backdrop-blur-sm rounded-xl p-8 border border-[#D0C8B9] border-opacity-20 transition-transform duration-300 ease-in-out transform hover:scale-105"
+            >
               <div className="flex items-center justify-center w-16 h-16 rounded-full bg-[#D0C8B9] text-black mb-6 mx-auto">
                 {step.icon}
               </div>
@@ -56,4 +75,3 @@ export function HowItWorks({ backgroundImage, backgroundColor = 'black' }: HowIt
     </div>
   );
 }
-
