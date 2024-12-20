@@ -1,5 +1,4 @@
 import { Metadata } from 'next'
-import { Navbar } from '@/components/ui/layout/navbar'
 import { Footer } from '@/components/ui/layout/footer'
 import { Timeline } from '@/components/ui/timeline'
 
@@ -56,4 +55,3 @@ export default function RoadmapPage() {
     </div>
   )
 }
-

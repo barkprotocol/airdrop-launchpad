@@ -12,9 +12,10 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { cn } from "@/lib/utils"
 import { toast } from 'react-hot-toast'
+import { WalletName } from '@solana/wallet-adapter-base'
 
 export function WalletButton() {
-  const { publicKey, wallet, disconnect, select, wallets, connecting } = useWallet()
+  const { publicKey, select, disconnect, connecting, wallets } = useWallet()
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
 
@@ -42,7 +43,7 @@ export function WalletButton() {
     }
   }, [disconnect])
 
-  const handleSelect = useCallback(async (walletName: string) => {
+  const handleSelect = useCallback(async (walletName: WalletName) => {
     try {
       await select(walletName)
       setIsDropdownOpen(false)
@@ -90,7 +91,7 @@ export function WalletButton() {
         {wallets.map((wallet) => (
           <DropdownMenuItem
             key={wallet.adapter.name}
-            onSelect={() => handleSelect(wallet.adapter.name)}
+            onSelect={() => handleSelect(wallet.adapter.name as WalletName)}
           >
             {wallet.adapter.name}
           </DropdownMenuItem>

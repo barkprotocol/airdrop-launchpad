@@ -10,7 +10,7 @@ export function isValidSolanaAddress(address: string): boolean {
   try {
     new PublicKey(address);
     return true;
-  } catch (error) {
+  } catch {
     return false;
   }
 }

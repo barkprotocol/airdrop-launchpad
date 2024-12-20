@@ -16,7 +16,7 @@ export async function distributeAirdrop(
   amount: bigint,
   category: string,
   description?: string
-): Promise<{ success: boolean; message: string }> {
+): Promise<{ success: boolean; message: string; airdropId: number }> {
   try {
     // Verify the wallet address
     if (!PublicKey.isOnCurve(recipientWalletAddress)) {
@@ -39,7 +39,7 @@ export async function distributeAirdrop(
     }
 
     // Create airdrop record
-    const airdrop = await createAirdrop(user.id, amount, 'pending', category, description)
+    const result = await createAirdrop(user.id, amount, 'pending', category, description)
 
     // Create or update eligibility
     const eligibility = await getEligibility(user.id)
@@ -63,10 +63,10 @@ export async function distributeAirdrop(
       'simulated-distribution-signature'
     )
 
-    return { success: true, message: 'Airdrop distributed successfully' }
+    return { success: true, message: 'Airdrop distributed successfully', airdropId: result.id }
   } catch (error) {
     console.error('Error distributing airdrop:', error)
-    return { success: false, message: 'Error distributing airdrop' }
+    return { success: false, message: 'Error distributing airdrop', airdropId: -1 }
   }
 }
 
