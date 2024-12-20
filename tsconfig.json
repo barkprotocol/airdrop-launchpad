@@ -20,7 +20,11 @@
     ],
     "paths": {
       "@/*": ["./*"]
-    }
+    },
+    "noUnusedLocals": false, // Disables warnings for unused local variables
+    "noUnusedParameters": false, // Disables warnings for unused parameters
+    "noImplicitReturns": false, // Allows functions to not have explicit return statements
+    "noFallthroughCasesInSwitch": false // Disables warnings for fallthrough cases in switch statements
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "exclude": ["node_modules"]
