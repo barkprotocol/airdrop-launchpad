@@ -37,4 +37,3 @@ export interface ClaimResponseData {
   operationalFee: number;
   communityFee: number;
 }
-

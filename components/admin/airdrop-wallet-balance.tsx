@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { getAirdropWalletBalance } from '@/lib/db/db'
+import { getAirdropWalletBalance } from '@/lib/db'
 
 export function AirdropWalletBalance() {
   const [balance, setBalance] = useState<{

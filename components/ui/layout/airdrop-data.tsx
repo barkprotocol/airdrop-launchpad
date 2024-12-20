@@ -69,4 +69,3 @@ function InfoItem({ label, value, tooltip }: { label: string; value: string; too
     </TooltipProvider>
   );
 }
-

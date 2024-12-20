@@ -1,48 +1,53 @@
 import { NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 
 export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url)
-  const page = parseInt(searchParams.get('page') || '1')
-  const limit = parseInt(searchParams.get('limit') || '10')
-  const filter = searchParams.get('filter')
-  const search = searchParams.get('search') || ''
+  const session = await getServerSession(authOptions)
 
-  const skip = (page - 1) * limit
+  if (!session || session.user.role !== 'ADMIN') {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
 
   try {
-    let whereClause: any = {}
-    if (filter && filter !== 'all') {
-      whereClause.status = filter.toUpperCase()
-    }
-    if (search) {
-      whereClause.OR = [
-        { walletAddress: { contains: search, mode: 'insensitive' } },
-        { email: { contains: search, mode: 'insensitive' } },
-      ]
-    }
-
-    const [users, total] = await Promise.all([
-      prisma.user.findMany({
-        where: whereClause,
-        orderBy: { createdAt: 'desc' },
-        skip,
-        take: limit,
-        select: {
-          id: true,
-          walletAddress: true,
-          email: true,
-          createdAt: true,
-          status: true,
-        },
-      }),
-      prisma.user.count({ where: whereClause }),
+    const adminStats = await prisma.$transaction([
+      prisma.user.count(),
+      prisma.claim.count(),
+      prisma.airdrop.count(),
+      prisma.transaction.count(),
     ])
 
-    return NextResponse.json({ users, total })
+    const [totalUsers, totalClaims, totalAirdrops, totalTransactions] = adminStats
+
+    return NextResponse.json({
+      totalUsers,
+      totalClaims,
+      totalAirdrops,
+      totalTransactions,
+    })
   } catch (error) {
-    console.error('Failed to fetch users:', error)
-    return NextResponse.json({ error: 'Failed to fetch users' }, { status: 500 })
+    console.error('Error fetching admin stats:', error)
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
+  }
+}
+
+export async function POST(request: Request) {
+  const session = await getServerSession(authOptions)
+
+  if (!session || session.user.role !== 'ADMIN') {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  try {
+    const body = await request.json()
+    // Handle admin-specific actions here
+    // For example, you could update global settings or perform batch operations
+
+    return NextResponse.json({ message: 'Admin action completed successfully' })
+  } catch (error) {
+    console.error('Error processing admin action:', error)
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
   }
 }
 

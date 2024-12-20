@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { claim } from "@/lib/claim";
-import { isValidSolanaAddress } from "@/lib/utils";
 
 export async function POST(req: Request) {
   try {
@@ -14,20 +13,10 @@ export async function POST(req: Request) {
       );
     }
 
-    if (!isValidSolanaAddress(walletAddress)) {
-      return NextResponse.json(
-        { error: "Invalid Solana wallet address" },
-        { status: 400 }
-      );
-    }
-
     const result = await claim(walletAddress, signature);
 
     if (result.success) {
-      return NextResponse.json({
-        message: result.message,
-        txSignature: result.txSignature
-      }, { status: 200 });
+      return NextResponse.json(result, { status: 200 });
     } else {
       return NextResponse.json({ error: result.message }, { status: 400 });
     }

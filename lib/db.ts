@@ -176,7 +176,7 @@ export async function createTransaction(
   status: string,
   transactionSignature?: string
 ) {
-  return prisma.transaction.create({
+  return prisma.$transaction.create({
     data: {
       airdropWalletId,
       amount,
@@ -188,21 +188,21 @@ export async function createTransaction(
 }
 
 export async function updateTransactionStatus(id: string, status: string, transactionSignature?: string) {
-  return prisma.transaction.update({
+  return prisma.$transaction.update({
     where: { id },
     data: { status, transactionSignature },
   })
 }
 
 export async function getTransactionsByAirdropWallet(airdropWalletId: string) {
-  return prisma.transaction.findMany({
+  return prisma.$transaction.findMany({
     where: { airdropWalletId },
     orderBy: { createdAt: 'desc' },
   })
 }
 
 export async function getTransactionById(id: string) {
-  return prisma.transaction.findUnique({
+  return prisma.$transaction.findUnique({
     where: { id },
   })
 }
@@ -217,9 +217,9 @@ export async function getUserTransactions(userId: string) {
     throw new Error('User not found')
   }
 
-  const claimIds = user.claims.map((claim: { id: any }) => claim.id)
+  const claimIds = user.claims.map(claim => claim.id)
 
-  return prisma.transaction.findMany({
+  return prisma.$transaction.findMany({
     where: {
       OR: [
         { recipientAddress: user.walletAddress },
@@ -232,7 +232,7 @@ export async function getUserTransactions(userId: string) {
 
 // Airdrop statistics functions
 export async function getTotalDistributedAmount() {
-  const result = await prisma.transaction.aggregate({
+  const result = await prisma.$transaction.aggregate({
     _sum: {
       amount: true,
     },
@@ -268,5 +268,15 @@ export async function getAirdropStatistics() {
   }
 }
 
-export default prisma
+export async function getTotalParticipants(): Promise<number> {
+  return prisma.user.count({
+    where: {
+      OR: [
+        { claims: { some: {} } },
+        { airdrops: { some: {} } }
+      ]
+    }
+  });
+}
 
+export default prisma

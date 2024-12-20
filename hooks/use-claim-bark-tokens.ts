@@ -3,7 +3,7 @@ import { useWallet } from '@solana/wallet-adapter-react'
 import { claim } from '@/lib/claim'
 import { toast } from 'react-hot-toast'
 
-export function useClaimBARKTokens() {
+export function useClaimBArkTokens() {
   const [isLoading, setIsLoading] = useState(false)
   const { publicKey, signMessage } = useWallet()
 
@@ -31,8 +31,8 @@ export function useClaimBARKTokens() {
         toast.error(result.message)
       }
     } catch (error) {
-      console.error('Error claiming BARK tokens:', error)
-      toast.error(error instanceof Error ? error.message : 'An error occurred while claiming BARK tokens')
+      console.error('Error claiming tokens:', error)
+      toast.error(error instanceof Error ? error.message : 'An error occurred while claiming tokens')
       throw error
     } finally {
       setIsLoading(false)
@@ -41,3 +41,4 @@ export function useClaimBARKTokens() {
 
   return { claimTokens, isLoading }
 }
+
