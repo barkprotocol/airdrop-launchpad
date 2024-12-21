@@ -3,6 +3,7 @@ import { Navbar } from '@/components/ui/layout/navbar'
 import { Footer } from '@/components/ui/layout/footer'
 import { APIEndpointComponent } from '@/components/api/api-endpoints'
 import { endpoints } from '@/app/api/endpoints'
+import { Key } from 'react'
 
 export const metadata: Metadata = {
   title: 'BARK Token Airdrop - API Documentation',
@@ -14,9 +15,9 @@ export default function APIDocsPage() {
     <div className="min-h-screen flex flex-col">
       <Navbar />
       <main className="flex-grow container mx-auto px-4 py-8">
-        <h1 className="text-4xl font-bold mb-8">BARK Token Airdrop - API Documentation</h1>
+        <h1 className="text-4xl font-bold mb-8">BARK Airdrop Platform - API Documentation</h1>
         <p className="text-xl mb-8">
-          This documentation provides details on how to interact with the BARK Token Airdrop system programmatically.
+          This documentation provides details on how to interact with the BARK Airdrop system programmatically.
           All endpoints require authentication using a JWT token, which can be obtained by logging in through the web interface.
         </p>
         <h2 className="text-2xl font-semibold mb-4">Authentication</h2>
@@ -29,7 +30,7 @@ export default function APIDocsPage() {
         </p>
         <h2 className="text-2xl font-semibold mb-4">Endpoints</h2>
         <div className="space-y-8">
-          {endpoints.map((endpoint, index) => (
+          {endpoints.map((endpoint: unknown, index: Key | null | undefined) => (
             <APIEndpointComponent key={index} endpoint={endpoint} />
           ))}
         </div>

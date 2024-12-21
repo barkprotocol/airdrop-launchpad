@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "BARK Token Airdrop Eligibility",
+  title: "BARK Airdrop Launchpad",
   description: "Check your eligibility for the exclusive $BARK token airdrop on Solana.",
 };
 

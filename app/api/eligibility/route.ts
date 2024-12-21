@@ -1,41 +1,82 @@
 import { NextResponse } from "next/server";
-import { isValidSolanaAddress } from "@/lib/utils";
-import { prisma } from "@/lib/prisma";
-import { checkEligibility } from "@/lib/claim";
+import { EligibilityResponse } from "@/utils/types";
 
-export async function POST(req: Request) {
+export const POST = async (req: Request) => {
   try {
     const body = await req.json();
     const { address } = body;
 
-    if (!address || !isValidSolanaAddress(address)) {
-      return NextResponse.json({ error: "Invalid Solana address" }, { status: 400 });
+    // Validate input
+    if (!address) {
+      return NextResponse.json(
+        { error: "Address is required" },
+        { status: 400 }
+      );
     }
 
-    const eligibilityResult = await checkEligibility(address);
-
-    if (eligibilityResult.isEligible) {
-      const user = await prisma.user.findUnique({
-        where: { walletAddress: address },
-        include: { eligibility: true },
-      });
-
-      if (user?.eligibility) {
-        return NextResponse.json({
-          isEligible: true,
-          totalAmount: user.eligibility.totalAmount.toString(),
-          unclaimedAmount: user.eligibility.unclaimedAmount.toString(),
-        });
-      }
+    // Optional: Validate Solana address format
+    const SOLANA_ADDRESS_REGEX = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
+    if (!SOLANA_ADDRESS_REGEX.test(address)) {
+      return NextResponse.json(
+        { error: "Invalid Solana address format" },
+        { status: 400 }
+      );
     }
 
-    return NextResponse.json({ 
-      isEligible: false,
-      reason: eligibilityResult.reason || "Unknown reason"
+    // Fetch eligibility data from BARK Protocol
+    const apiUrl = `https://api.barkprotocol.net/v0.1/airdrops/bark/eligibility/${address}`;
+    const response = await fetch(apiUrl, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
     });
-  } catch (error) {
-    console.error("Error checking eligibility:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
-  }
-}
 
+    // Handle non-successful responses
+    if (!response.ok) {
+      console.error(
+        `Failed to fetch eligibility data. Status: ${response.status}, Text: ${response.statusText}`
+      );
+      return NextResponse.json(
+        { error: "Failed to fetch eligibility data" },
+        { status: response.status }
+      );
+    }
+
+    // Parse and validate the response
+    const eligibilityData = (await response.json()) as EligibilityResponse;
+    if (!eligibilityData || typeof eligibilityData.totalUnclaimed !== "number") {
+      console.error("Invalid eligibility data received:", eligibilityData);
+      return NextResponse.json(
+        { error: "Invalid data received from the BARK Protocol server" },
+        { status: 500 }
+      );
+    }
+
+    // Check eligibility
+    if (eligibilityData.totalUnclaimed === 0) {
+      return NextResponse.json(
+        {
+          error: "You are either not eligible or have already claimed tokens",
+        },
+        { status: 400 }
+      );
+    }
+
+    // Return eligibility data if successful
+    return NextResponse.json(
+      { eligibility: eligibilityData },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Error processing eligibility request:", error);
+
+    return NextResponse.json(
+      {
+        error:
+          "An error occurred while processing the request. Please try again later.",
+      },
+      { status: 500 }
+    );
+  }
+};

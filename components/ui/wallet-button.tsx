@@ -19,9 +19,7 @@ export function WalletButton() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
 
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+  useEffect(() => setMounted(true), [])
 
   const buttonClasses = cn(
     "bg-white text-black",
@@ -64,7 +62,9 @@ export function WalletButton() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-58 bg-background/80 backdrop-blur-sm">
-        <DropdownMenuItem onSelect={handleDisconnect}>Disconnect</DropdownMenuItem>
+        <DropdownMenuItem onSelect={handleDisconnect}>
+          Disconnect
+        </DropdownMenuItem>
         <DropdownMenuItem>
           <span className="text-xs">{publicKey?.toBase58()}</span>
         </DropdownMenuItem>
@@ -100,12 +100,8 @@ export function WalletButton() {
     </DropdownMenu>
   )
 
-  if (!mounted) {
-    return null
-  }
-
+  if (!mounted) return null
   if (publicKey) return renderConnectedState()
   if (connecting) return renderConnectingState()
   return renderDisconnectedState()
 }
-
