@@ -1,0 +1,120 @@
+openapi: 3.0.0
+info:
+  title: BARK | Airdrop API
+  description: API for managing BARK Protocol airdrop transactions, claim tokens, balances, and user interactions.
+  version: 1.0.0
+paths:
+  /transactions:
+    get:
+      summary: Get a list of transactions
+      description: Retrieves all transactions with optional filters like page, limit, and status.
+      operationId: getTransactions
+      parameters:
+        - in: query
+          name: page
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - in: query
+          name: limit
+          required: false
+          schema:
+            type: integer
+            default: 10
+        - in: query
+          name: filter
+          required: false
+          schema:
+            type: string
+            enum: [all, pending, completed, failed]
+        - in: query
+          name: search
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A list of transactions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  transactions:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Transaction'
+                  total:
+                    type: integer
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Failed to fetch transactions"
+  /airdrop/balance:
+    get:
+      summary: Get airdrop wallet balance
+      description: Retrieves the balance for a specific airdrop wallet address.
+      operationId: getAirdropBalance
+      parameters:
+        - in: query
+          name: walletAddress
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Wallet balance retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  balance:
+                    type: string
+                    example: "1000.00"
+        '400':
+          description: Invalid wallet address
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Invalid wallet address provided."
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Failed to retrieve balance"
+components:
+  schemas:
+    Transaction:
+      type: object
+      properties:
+        id:
+          type: string
+        amount:
+          type: string
+        recipientAddress:
+          type: string
+        status:
+          type: string
+        transactionSignature:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time

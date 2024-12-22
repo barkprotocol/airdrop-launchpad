@@ -12,7 +12,7 @@ BARK Token Sale & Airdrop Launchpad is a decentralized application (dApp) built 
   - **Solana Wallet Adapter**: For integrating popular Solana wallets like Phantom, Backpack, and Solflare.
   
 - **Backend**:
-  - **Admin Dasboard**: 
+  - **Admin Dashboard**: 
   - **Solana Blockchain**: For decentralized token transfers, eligibility checks, and interaction with the BARK ecosystem.
   - **Prisma ORM**: For seamless database interaction and data management.
   - **Helius API**: For interacting with the Solana blockchain to gather transaction data and process eligibility.

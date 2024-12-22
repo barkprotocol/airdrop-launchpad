@@ -1,0 +1,67 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  name      String
+  wallet    Wallet    @relation(fields: [walletId], references: [id])
+  walletId  Int
+  eligibility Eligibility?
+  claims    Claim[]
+}
+
+model Eligibility {
+  id               String   @id @default(uuid())
+  userId           String   @unique
+  user             User     @relation(fields: [userId], references: [id])
+  totalAmount      BigInt
+  unclaimedAmount  BigInt
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model Claim {
+  id                   String   @id @default(uuid())
+  userId               String
+  user                 User     @relation(fields: [userId], references: [id])
+  amount               BigInt
+  transactionSignature String?
+  status               String
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  claims               Claim[]
+}
+
+model AirdropWallet {
+  id           String   @id @default(cuid())
+  walletAddress String   @unique
+  balance      Float
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model AirdropConfig {
+  id                String   @id @default(uuid())
+  totalSupply       BigInt
+  airdropAllocation BigInt
+  airdropDate       DateTime
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model Wallet {
+  id        Int       @id @default(autoincrement())
+  address   String    @unique
+  user      User      @relation(fields: [userId], references: [id])
+  userId    Int
+}
