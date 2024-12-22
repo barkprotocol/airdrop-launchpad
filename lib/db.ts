@@ -1,101 +1,151 @@
-import { PrismaClient, User, Airdrop, Eligibility } from '@prisma/client';
+import prisma from '@/prisma/client'; 
 
-const prisma = new PrismaClient();
-
-// User-related functions
-export async function getUserByWalletAddress(walletAddress: string): Promise<User | null> {
+// Get user by wallet address
+export async function getUserByWalletAddress(walletAddress: string) {
   try {
-    return await prisma.user.findUnique({
+    const user = await prisma.user.findUnique({
       where: { walletAddress },
-      include: { eligibility: true, claims: true, airdrops: true },
     });
+    return user;
   } catch (error) {
     console.error('Error fetching user by wallet address:', error);
-    throw new Error('Unable to fetch user by wallet address');
+    throw new Error('Unable to get user by wallet address');
   }
 }
 
-export async function createUser(walletAddress: string): Promise<User> {
+// Get eligibility for a user in a specific airdrop campaign
+export async function getEligibility(userId: string, airdropCampaignId: string) {
   try {
-    return await prisma.user.create({
-      data: { walletAddress },
+    const eligibility = await prisma.eligibility.findUnique({
+      where: {
+        userId_airdropCampaignId: {
+          userId,
+          airdropCampaignId,
+        },
+      },
     });
+    return eligibility;
   } catch (error) {
-    console.error('Error creating user:', error);
-    throw new Error('Unable to create user');
+    console.error('Error fetching eligibility:', error);
+    throw new Error('Unable to fetch eligibility');
   }
 }
 
-// Eligibility-related functions
-export async function createEligibility(userId: string, totalAmount: bigint, unclaimedAmount: bigint) {
+// Create a new claim record for a user
+export async function createClaim(userId: string, airdropCampaignId: string) {
   try {
-    return await prisma.eligibility.create({
-      data: { userId, totalAmount, unclaimedAmount },
+    const claim = await prisma.claim.create({
+      data: {
+        userId,
+        airdropCampaignId,
+        status: 'pending', // Default status as 'pending'
+      },
     });
+    return claim;
   } catch (error) {
-    console.error('Error creating eligibility:', error);
-    throw new Error('Unable to create eligibility');
+    console.error('Error creating claim:', error);
+    throw new Error('Unable to create claim');
   }
 }
 
-// Airdrop-related functions
-export async function createAirdrop(userId: string, amount: bigint, claimStatus: string, category: string, description: string | undefined) {
+// Update airdrop status (e.g., 'completed' or 'in-progress')
+export async function updateAirdropStatus(airdropCampaignId: string, status: string) {
   try {
-    return await prisma.airdrop.create({
-      data: { userId, amount, claimStatus, category, description },
+    const updatedAirdrop = await prisma.airdropCampaign.update({
+      where: { id: airdropCampaignId },
+      data: { status },
     });
+    return updatedAirdrop;
   } catch (error) {
-    console.error('Error creating airdrop:', error);
-    throw new Error('Unable to create airdrop');
+    console.error('Error updating airdrop status:', error);
+    throw new Error('Unable to update airdrop status');
   }
 }
 
-// Airdrop statistics functions
-export async function getAirdropStatistics() {
+// Check if a user is whitelisted for a specific airdrop
+export async function isWhitelisted(userId: string, airdropCampaignId: string) {
   try {
-    const totalDistributed = await getTotalDistributedAmount();
-    const totalClaimed = await getTotalClaimedAmount();
-    const airdropWalletBalance = await airdropWalletBalance();
-
-    return {
-      totalDistributed: totalDistributed.toString(),
-      totalClaimed: totalClaimed.toString(),
-      airdropWalletBalance: airdropWalletBalance.toString(),
-      remainingToClaim: (totalDistributed - totalClaimed).toString(),
-    };
-  } catch (error) {
-    console.error('Error fetching airdrop statistics:', error);
-    throw new Error('Unable to fetch airdrop statistics');
-  }
-}
-
-// Implement the missing functions with Prisma aggregation
-async function getTotalDistributedAmount(): Promise<bigint> {
-  try {
-    const totalDistributed = await prisma.airdrop.aggregate({
-      _sum: { amount: true },
+    const whitelist = await prisma.whitelist.findFirst({
+      where: {
+        userId,
+        airdropCampaignId,
+      },
     });
-    return totalDistributed._sum.amount || 0n;
+    return whitelist !== null;
   } catch (error) {
-    console.error('Error fetching total distributed amount:', error);
-    throw new Error('Unable to fetch total distributed amount');
+    console.error('Error checking whitelist status:', error);
+    throw new Error('Unable to check whitelist status');
   }
 }
 
-async function getTotalClaimedAmount(): Promise<bigint> {
+// Get the wallet address associated with an airdrop campaign
+export async function getAirdropWallet(airdropCampaignId: string) {
   try {
-    const totalClaimed = await prisma.airdrop.aggregate({
-      where: { claimStatus: 'claimed' },
-      _sum: { amount: true },
+    const wallet = await prisma.airdropWallet.findUnique({
+      where: { airdropCampaignId },
     });
-    return totalClaimed._sum.amount || 0n;
+    return wallet;
   } catch (error) {
-    console.error('Error fetching total claimed amount:', error);
-    throw new Error('Unable to fetch total claimed amount');
+    console.error('Error fetching airdrop wallet:', error);
+    throw new Error('Unable to fetch airdrop wallet');
   }
 }
 
-async function airdropWalletBalance(): Promise<bigint> {
-  // Implement logic to fetch the balance of the airdrop wallet
-  return 1000000n; // Example placeholder
+// Update the balance of an airdrop wallet (e.g., after distributing tokens)
+export async function updateAirdropWalletBalance(airdropCampaignId: string, newBalance: number) {
+  try {
+    const updatedWallet = await prisma.airdropWallet.update({
+      where: { airdropCampaignId },
+      data: { balance: newBalance },
+    });
+    return updatedWallet;
+  } catch (error) {
+    console.error('Error updating airdrop wallet balance:', error);
+    throw new Error('Unable to update airdrop wallet balance');
+  }
+}
+
+// Create a new transaction record for tracking claims, transfers, etc.
+export async function createTransaction(userId: string, transactionHash: string, status: string) {
+  try {
+    const transaction = await prisma.transaction.create({
+      data: {
+        userId,
+        transactionHash,
+        status, // e.g., 'pending', 'success', 'failed'
+      },
+    });
+    return transaction;
+  } catch (error) {
+    console.error('Error creating transaction:', error);
+    throw new Error('Unable to create transaction');
+  }
+}
+
+// Update the status of a claim (e.g., 'approved', 'rejected', etc.)
+export async function updateClaimStatus(claimId: string, status: string) {
+  try {
+    const updatedClaim = await prisma.claim.update({
+      where: { id: claimId },
+      data: { status },
+    });
+    return updatedClaim;
+  } catch (error) {
+    console.error('Error updating claim status:', error);
+    throw new Error('Unable to update claim status');
+  }
+}
+
+// Update eligibility status (e.g., after claim approval)
+export async function updateEligibility(userId: string, airdropCampaignId: string, isEligible: boolean) {
+  try {
+    const updatedEligibility = await prisma.eligibility.update({
+      where: { userId_airdropCampaignId: { userId, airdropCampaignId } },
+      data: { isEligible },
+    });
+    return updatedEligibility;
+  } catch (error) {
+    console.error('Error updating eligibility:', error);
+    throw new Error('Unable to update eligibility');
+  }
 }

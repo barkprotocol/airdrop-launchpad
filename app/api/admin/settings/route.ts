@@ -1,75 +1,53 @@
 import { NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { z } from 'zod'
 
-const settingsSchema = z.object({
-  airdropWalletAddress: z.string().min(1, "Airdrop wallet address is required"),
-  minClaimAmount: z.coerce.number().positive("Minimum claim amount must be a positive number"),
-  maxClaimAmount: z.coerce.number().positive("Maximum claim amount must be a positive number"),
-  enableClaims: z.boolean(),
-})
+export async function GET(request: Request) {
+  const session = await getServerSession(authOptions)
 
-export async function GET() {
+  if (!session || session.user.role !== 'ADMIN') {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   try {
-    const settings = await prisma.adminSettings.findFirst()
-    
-    if (!settings) {
-      return NextResponse.json(
-        { error: 'Admin settings not found' },
-        { status: 404 }
-      )
-    }
+    const adminStats = await prisma.$transaction([
+      prisma.user.count(),
+      prisma.claim.count(),
+      prisma.airdrop.count(),
+      prisma.transaction.count(),
+    ])
 
-    return NextResponse.json(settings)
+    const [totalUsers, totalClaims, totalAirdrops, totalTransactions] = adminStats
+
+    return NextResponse.json({
+      totalUsers,
+      totalClaims,
+      totalAirdrops,
+      totalTransactions,
+    })
   } catch (error) {
-    console.error('Failed to fetch admin settings:', error)
-    return NextResponse.json(
-      { error: 'An error occurred while fetching admin settings' },
-      { status: 500 }
-    )
+    console.error('Error fetching admin stats:', error)
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
   }
 }
 
 export async function POST(request: Request) {
+  const session = await getServerSession(authOptions)
+
+  if (!session || session.user.role !== 'ADMIN') {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   try {
     const body = await request.json()
-    
-    const validationResult = settingsSchema.safeParse(body)
-    
-    if (!validationResult.success) {
-      return NextResponse.json(
-        { error: 'Invalid settings data', details: validationResult.error.issues },
-        { status: 400 }
-      )
-    }
+    // Handle admin-specific actions here
+    // For example, you could update global settings or perform batch operations
 
-    const { airdropWalletAddress, minClaimAmount, maxClaimAmount, enableClaims } = validationResult.data
-
-    const updatedSettings = await prisma.adminSettings.upsert({
-      where: { id: 1 }, // Assuming there's only one settings record
-      update: {
-        airdropWalletAddress,
-        minClaimAmount,
-        maxClaimAmount,
-        enableClaims,
-      },
-      create: {
-        airdropWalletAddress,
-        minClaimAmount,
-        maxClaimAmount,
-        enableClaims,
-      },
-    })
-
-    return NextResponse.json({
-      message: 'Admin settings updated successfully',
-      settings: updatedSettings,
-    })
+    return NextResponse.json({ message: 'Admin action completed successfully' })
   } catch (error) {
-    console.error('Failed to update admin settings:', error)
-    return NextResponse.json(
-      { error: 'An error occurred while updating admin settings' },
-      { status: 500 }
-    )
+    console.error('Error processing admin action:', error)
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
   }
 }
+

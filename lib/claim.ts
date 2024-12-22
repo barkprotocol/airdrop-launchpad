@@ -11,9 +11,9 @@ import {
   updateEligibility
 } from './db'
 import { PublicKey } from '@solana/web3.js'
-import { transferBArkTokens } from './token-transfer'
+import { transferBarkTokens } from '@/components/services/send-tokens'
 import { isBarkTokenHolder } from './token-utils';
-import { readWhitelistFromCSV } from './csv-utils';
+import { readWhitelistFromCSV } from '@/utils/csv-utils';
 
 export async function checkEligibility(walletAddress: string): Promise<{ isEligible: boolean; reason?: string }> {
   try {
@@ -41,7 +41,7 @@ export async function checkEligibility(walletAddress: string): Promise<{ isEligi
 
     // Check whitelist (including CSV)
     const isWhitelistedDB = await isWhitelisted(walletAddress);
-    const csvWhitelist = readWhitelistFromCSV();
+    const csvWhitelist = await readWhitelistFromCSV();
     const isWhitelistedCSV = csvWhitelist.includes(walletAddress);
     if (!isWhitelistedDB && !isWhitelistedCSV) {
       return { isEligible: false, reason: 'Not whitelisted for claim' };
@@ -74,7 +74,7 @@ export async function claim(walletAddress: string, signature: string): Promise<{
 
     // Check whitelist (including CSV)
     const isWhitelistedDB = await isWhitelisted(walletAddress);
-    const csvWhitelist = readWhitelistFromCSV();
+    const csvWhitelist = await readWhitelistFromCSV();
     const isWhitelistedCSV = csvWhitelist.includes(walletAddress);
     if (!isWhitelistedDB && !isWhitelistedCSV) {
       return { success: false, message: 'Not whitelisted for claim' };
@@ -98,7 +98,7 @@ export async function claim(walletAddress: string, signature: string): Promise<{
     const claim = await createClaim(user.id, eligibility.unclaimedAmount, 'processing')
 
     // Trigger the actual token transfer
-    const transferResult = await transferBArkTokens(airdropWallet.walletAddress, walletAddress, BigInt(eligibility.unclaimedAmount))
+    const transferResult = await transferBarkTokens(airdropWallet.walletAddress, walletAddress, BigInt(eligibility.unclaimedAmount))
     
     if (!transferResult.success) {
       await updateClaimStatus(claim.id, 'failed')

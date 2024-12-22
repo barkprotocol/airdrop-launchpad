@@ -9,7 +9,6 @@ export const metadata: Metadata = {
 export default function DisclaimerPage() {
   return (
     <div className="min-h-screen flex flex-col">
-      <Navbar />
       <main className="flex-grow container mx-auto px-4 py-8">
         <h1 className="text-4xl font-bold mb-6">Legal Disclaimer</h1>
         <div className="space-y-6">
