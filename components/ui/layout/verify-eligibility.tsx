@@ -30,13 +30,9 @@ const formSchema = z.object({
     }),
 })
 
-const AIRDROP_DATE = '2024-12-31T00:00:00Z'
+const AIRDROP_DATE = '2025-02-29T00:00:00Z'
 
-interface VerifyEligibilityProps {
-  saleType: 'airdrop' | 'iwo';
-}
-
-export function VerifyEligibility({ saleType }: VerifyEligibilityProps) {
+export function VerifyEligibility() {
   const [isChecking, setIsChecking] = useState(false)
   const [eligibilityResult, setEligibilityResult] = useState<{
     isEligible: boolean
@@ -56,7 +52,7 @@ export function VerifyEligibility({ saleType }: VerifyEligibilityProps) {
     setEligibilityResult(null)
 
     try {
-      const response = await fetch(`/api/check-${saleType}-eligibility`, {
+      const response = await fetch('/api/check-eligibility', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -65,22 +61,22 @@ export function VerifyEligibility({ saleType }: VerifyEligibilityProps) {
       })
 
       if (!response.ok) {
-        throw new Error(`Failed to check ${saleType} eligibility`)
+        throw new Error('Failed to check eligibility')
       }
 
       const data = await response.json()
       setEligibilityResult(data)
 
       if (data.isEligible) {
-        toast.success(`Congratulations! You are eligible for the ${saleType === 'airdrop' ? 'BARK airdrop' : 'BARK IWO'}.`)
+        toast.success(`Congratulations! You are eligible for ${data.amount} BARK tokens.`)
       } else {
-        toast(`You are not currently eligible for the ${saleType === 'airdrop' ? 'BARK airdrop' : 'BARK IWO'}.`, {
+        toast('You are not currently eligible for the BARK airdrop.', {
           icon: '🔔',
         })
       }
     } catch (error) {
-      console.error(`Error checking ${saleType} eligibility:`, error)
-      toast.error(`An error occurred while checking ${saleType} eligibility. Please try again.`)
+      console.error('Error checking eligibility:', error)
+      toast.error('An error occurred while checking eligibility. Please try again.')
     } finally {
       setIsChecking(false)
     }
@@ -88,16 +84,14 @@ export function VerifyEligibility({ saleType }: VerifyEligibilityProps) {
 
   return (
     <div className="w-full max-w-md mx-auto">
-      {saleType === 'airdrop' && (
-        <div className="mb-8">
-          <Countdown
-            targetDate={AIRDROP_DATE}
-            className="bg-[#1a1a1a] text-[#d0c8b9] p-4 rounded-lg shadow-lg"
-            onComplete={() => setClaimEnded(true)}
-          />
-        </div>
-      )}
-      {claimEnded && saleType === 'airdrop' ? (
+      <div className="mb-8">
+        <Countdown
+          targetDate={AIRDROP_DATE}
+          className="bg-[#1a1a1a] text-[#d0c8b9] p-4 rounded-lg shadow-lg"
+          onComplete={() => setClaimEnded(true)}
+        />
+      </div>
+      {claimEnded ? (
         <div className="text-center p-4 bg-[#1a1a1a] text-[#d0c8b9] rounded-lg">
           <h3 className="text-xl font-semibold mb-2">Claim Period Ended</h3>
           <p>The BARK token claim period has ended. Thank you for your participation!</p>
@@ -115,7 +109,7 @@ export function VerifyEligibility({ saleType }: VerifyEligibilityProps) {
                     <Input placeholder="Enter your Solana wallet address" {...field} />
                   </FormControl>
                   <FormDescription>
-                    Enter your Solana wallet address to check your eligibility for the BARK {saleType === 'airdrop' ? 'airdrop' : 'IWO'}.
+                    Enter your Solana wallet address to check your eligibility for the BARK airdrop.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -134,7 +128,7 @@ export function VerifyEligibility({ saleType }: VerifyEligibilityProps) {
                     Checking...
                   </>
                 ) : (
-                  `Check ${saleType === 'airdrop' ? 'Airdrop' : 'IWO'} Eligibility`
+                  'Check Eligibility'
                 )}
               </span>
             </Button>
@@ -149,12 +143,10 @@ export function VerifyEligibility({ saleType }: VerifyEligibilityProps) {
           </h3>
           <p className="text-[#dcd7cc]">
             {eligibilityResult.isEligible
-              ? `You are eligible for the BARK ${saleType === 'airdrop' ? 'airdrop' : 'IWO'}. ${
-                  eligibilityResult.amount
-                    ? `You can claim ${eligibilityResult.amount} BARK tokens.`
-                    : `You can participate in the ${saleType === 'airdrop' ? 'airdrop' : 'IWO'}.`
-                }`
-              : `You are not currently eligible for the BARK ${saleType === 'airdrop' ? 'airdrop' : 'IWO'}. Keep an eye out for future opportunities!`}
+              ? `You are eligible for the BARK airdrop. You can claim ${
+                  eligibilityResult.amount || 'your'
+                } BARK tokens.`
+              : 'You are not currently eligible for the BARK airdrop. Keep an eye out for future opportunities!'}
           </p>
         </div>
       )}

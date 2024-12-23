@@ -1,7 +1,7 @@
 "use client";
 
 import Image from 'next/image';
-import { VerifyEligibility } from '@/components/ui/layout/verify-eligibility';
+import { VerifyEligibility } from '@/components/ui/layout/verify-eligibility-iwo';
 
 const BACKGROUND_URL = "https://ucarecdn.com/f6029e68-9768-49db-80a9-64e41e70acff/waveblack.png";
 
