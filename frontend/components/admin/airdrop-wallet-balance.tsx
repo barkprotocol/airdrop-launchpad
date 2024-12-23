@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+<<<<<<< HEAD:frontend/components/admin/airdrop-wallet-balance.tsx
 
 async function fetchAirdropWalletBalance() {
   try {
@@ -17,6 +18,9 @@ async function fetchAirdropWalletBalance() {
     return null
   }
 }
+=======
+import { getAirdropWalletBalance } from '@/app/database/db'
+>>>>>>> 942a7b7 (updated):components/admin/airdrop-wallet-balance.tsx
 
 export function AirdropWalletBalance() {
   const [balance, setBalance] = useState<{

@@ -1,7 +1,16 @@
 import { useState } from 'react'
-import { useWallet } from '@solana/wallet-adapter-react'
-import { claim } from '@/lib/claim'
 import { toast } from 'react-hot-toast'
+import { useWallet } from '@/hooks/use-wallet'
+
+// Define the shape of the claim function result
+interface ClaimResult {
+  success: boolean
+  message: string
+  txSignature?: string
+}
+
+// Import the claim function
+import { claim } from '@/lib/claim'
 
 export function useClaimBArkTokens() {
   const [isLoading, setIsLoading] = useState(false)
@@ -17,12 +26,14 @@ export function useClaimBArkTokens() {
     setIsLoading(true)
 
     try {
-      const message = `Claim BARK tokens for ${publicKey.toBase58()}`
-      const encodedMessage = new TextEncoder().encode(message)
-      const signedMessage = await signMessage(encodedMessage)
-      const signature = Buffer.from(signedMessage).toString('base64')
+      const message = `Claim BARK tokens for ${publicKey.toString()}`
+      const signature = await signMessage(message)
 
-      const result = await claim(publicKey.toBase58(), signature)
+      if (!signature) {
+        throw new Error('Failed to sign message')
+      }
+
+      const result: ClaimResult = await claim(publicKey.toString(), signature)
 
       if (result.success) {
         toast.success(result.message)
@@ -31,8 +42,8 @@ export function useClaimBArkTokens() {
         toast.error(result.message)
       }
     } catch (error) {
-      console.error('Error claiming tokens:', error)
-      toast.error(error instanceof Error ? error.message : 'An error occurred while claiming tokens')
+      console.error('Error claiming BARK tokens:', error)
+      toast.error(error instanceof Error ? error.message : 'An error occurred while claiming BARK tokens')
       throw error
     } finally {
       setIsLoading(false)
@@ -41,4 +52,3 @@ export function useClaimBArkTokens() {
 
   return { claimTokens, isLoading }
 }
-

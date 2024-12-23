@@ -1,27 +1,32 @@
-import { 
-  getUserByWalletAddress, 
-  getEligibility, 
-  createClaim, 
-  updateAirdropStatus, 
-  isWhitelisted,
-  getAirdropWallet,
-  updateAirdropWalletBalance,
-  createTransaction,
-  updateClaimStatus,
-  updateEligibility
-} from './db'
 import { PublicKey } from '@solana/web3.js'
+<<<<<<< HEAD:frontend/lib/claim.ts
 import { transferBarkTokens } from '@/components/services/send-tokens-function'
 import { isBarkTokenHolder } from './token-utils';
 import { readWhitelistFromCSV } from '@/utils/csv-utils';
+=======
+>>>>>>> 942a7b7 (updated):lib/claim.ts
 
-export async function checkEligibility(walletAddress: string): Promise<{ isEligible: boolean; reason?: string }> {
+interface ClaimResult {
+  success: boolean
+  message: string
+  txSignature?: string
+}
+
+export async function claim(address: string, signature: string): Promise<ClaimResult> {
   try {
-    // Verify the wallet address
-    if (!PublicKey.isOnCurve(walletAddress)) {
-      return { isEligible: false, reason: 'Invalid wallet address' };
+    const response = await fetch('/api/claim-tokens', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ address, signature }),
+    })
+
+    if (!response.ok) {
+      throw new Error('Failed to claim BARK tokens')
     }
 
+<<<<<<< HEAD:frontend/lib/claim.ts
     // Check if the user is a BARK token holder
     const isBarkHolder = await isBarkTokenHolder(walletAddress);
     if (!isBarkHolder) {
@@ -138,6 +143,16 @@ export async function claim(walletAddress: string, signature: string): Promise<{
   } catch (error) {
     console.error('Error processing claim:', error)
     return { success: false, message: 'Error processing claim' }
+=======
+    const result: ClaimResult = await response.json()
+    return result
+  } catch (error) {
+    console.error('Error in claim function:', error)
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : 'An error occurred while claiming tokens',
+    }
+>>>>>>> 942a7b7 (updated):lib/claim.ts
   }
 }
 

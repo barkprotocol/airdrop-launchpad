@@ -1,4 +1,5 @@
-import { PublicKey } from '@solana/web3.js';
+import { PublicKey, Connection } from '@solana/web3.js';
+import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
 
 // Token-related constants
 export const BARK_TOKEN_MINT = new PublicKey('2NTvEssJ2i998V2cMGT4Fy3JhyFnAzHFonDo9dbAkVrg');
@@ -9,7 +10,7 @@ export const SOLANA_NETWORK = process.env.NEXT_PUBLIC_SOLANA_NETWORK || 'mainnet
 export const RPC_ENDPOINT = process.env.NEXT_PUBLIC_RPC_ENDPOINT || 'https://api.mainnet-beta.solana.com';
 
 // API endpoints
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.barkprotocol.com';
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.airdrop.barkprotocol.net';
 export const ELIGIBILITY_ENDPOINT = `${API_BASE_URL}/api/eligibility`;
 export const CLAIM_ENDPOINT = `${API_BASE_URL}/api/claim`;
 export const STATS_ENDPOINT = `${API_BASE_URL}/api/stats`;
@@ -66,3 +67,28 @@ export const FEATURES = {
   SHOW_TESTNET_WARNING: process.env.NEXT_PUBLIC_SHOW_TESTNET_WARNING === 'true',
 };
 
+// Solana connection setup
+const connection = new Connection(RPC_ENDPOINT, 'confirmed');
+
+// Utility to check if the wallet holds BARK tokens
+export async function isBarkTokenHolder(walletAddress: string): Promise<boolean> {
+  const walletPublicKey = new PublicKey(walletAddress);
+  const tokenAccounts = await connection.getParsedTokenAccountsByOwner(walletPublicKey, {
+    programId: TOKEN_PROGRAM_ID,
+  });
+
+  for (const account of tokenAccounts.value) {
+    const tokenMint = account.account.data.parsed.info.mint;
+    const tokenAmount = account.account.data.parsed.info.tokenAmount;
+
+    // Check if this account holds BARK tokens and if balance is greater than 0
+    if (tokenMint === BARK_TOKEN_MINT.toBase58()) {
+      const amount = parseInt(tokenAmount.amount) / Math.pow(10, BARK_TOKEN_DECIMALS); // Convert using decimals
+      if (amount > 0) {
+        return true;
+      }
+    }
+  }
+  
+  return false;
+}

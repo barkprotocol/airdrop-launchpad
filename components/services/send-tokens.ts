@@ -1,21 +1,3 @@
-<<<<<<< HEAD:frontend/lib/send-tokens.ts
-import { sendTokens } from '@/components/services/send-tokens-function';
-
-const destinationWallet = 'recipient_wallet_address_here';
-const amountToSend = BigInt(1000); // Adjust this based on token decimals (e.g., 1000 * 10^9 for 9 decimals)
-
-sendTokens(destinationWallet, amountToSend)
-  .then((result) => {
-    if (result.success) {
-      console.log(`Transaction successful! TX Signature: ${result.txSignature}`);
-    } else {
-      console.error(`Error: ${result.message}`);
-    }
-  })
-  .catch((error) => {
-    console.error(`Unexpected error: ${error.message}`);
-  });
-=======
 import { Connection, Keypair, PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js';
 import { TOKEN_PROGRAM_ID, createTransferCheckedInstruction, getAssociatedTokenAddress } from '@solana/spl-token';
 
@@ -93,4 +75,3 @@ export async function sendTokens(
     return { success: false, message: error.message };
   }
 }
->>>>>>> 942a7b7 (updated):lib/send-tokens.ts

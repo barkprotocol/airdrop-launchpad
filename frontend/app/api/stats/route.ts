@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getAirdropStatistics, getTotalParticipants } from '@/lib/db';
+import { getAirdropStatistics, getTotalParticipants } from '@/app/database/db';
 
 export async function GET() {
   try {

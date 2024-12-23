@@ -45,6 +45,10 @@ The eligibility check combines multiple sources:
 - Presence in the CSV whitelist
 - Having unclaimed BARK tokens in the database
 
+# Test eligibility checker / Whitelist
+
+**Test Address**: 9ZNTfG4NyQgxy2SWjSiQoUyBPEvXT2xo7fKc5hPYYJ7b
+
 ## Prerequisites
 
 Before you begin, ensure you have met the following requirements:

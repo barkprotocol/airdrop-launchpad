@@ -1,5 +1,9 @@
 import nodemailer from 'nodemailer';
+<<<<<<< HEAD:frontend/utils/notification.ts
 import { prisma } from '@/prisma/client';
+=======
+import { prisma } from '@/lib/prisma-client';
+>>>>>>> 942a7b7 (updated):utils/notification.ts
 
 // Function to send an email notification
 export async function sendNotification(userId: string, title: string, message: string): Promise<void> {

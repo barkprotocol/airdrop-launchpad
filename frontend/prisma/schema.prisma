@@ -1,16 +1,48 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+// schema.prisma
 
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+  schemas  = ["public", "auth"]
+}
+
+enum ClaimStatus {
+  PENDING
+  CLAIMED
+  FAILED
+  CANCELLED
+
+  @@schema("public")
+}
+
+model Airdrop {
+  id           String       @id @default(uuid())
+  walletId     String
+  wallet       Wallet       @relation(fields: [walletId], references: [id])
+  claims       Claim[]
+  createdAt    DateTime     @default(now())
+
+  @@schema("public")
+}
+
+model Wallet {
+  id        String    @id @default(uuid())
+  userId    String    @unique
+  user      User      @relation(fields: [userId], references: [id])
+  airdrops  Airdrop[]
+  createdAt DateTime  @default(now())
+
+  @@schema("public")
 }
 
 model User {
+<<<<<<< HEAD:frontend/prisma/schema.prisma
   id        Int       @id @default(autoincrement())
   email     String    @unique
   name      String
@@ -18,19 +50,29 @@ model User {
   walletId  Int
   eligibility Eligibility?
   claims    Claim[]
+=======
+  id           String       @id @default(uuid())
+  wallet       Wallet?
+  eligibility  Eligibility?
+  claims       Claim[]
+  createdAt    DateTime     @default(now())
+
+  @@schema("public")
+>>>>>>> 942a7b7 (updated):prisma/schema.prisma
 }
 
 model Eligibility {
-  id               String   @id @default(uuid())
-  userId           String   @unique
-  user             User     @relation(fields: [userId], references: [id])
-  totalAmount      BigInt
-  unclaimedAmount  BigInt
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  id         String   @id @default(uuid())
+  userId     String   @unique
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  isEligible Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  @@schema("public")
 }
 
 model Claim {
+<<<<<<< HEAD:frontend/prisma/schema.prisma
   id                   String   @id @default(uuid())
   userId               String
   user                 User     @relation(fields: [userId], references: [id])
@@ -64,4 +106,15 @@ model Wallet {
   address   String    @unique
   user      User      @relation(fields: [userId], references: [id])
   userId    Int
+=======
+  id        String      @id @default(uuid())
+  airdropId String
+  airdrop   Airdrop     @relation(fields: [airdropId], references: [id])
+  userId    String
+  user      User        @relation(fields: [userId], references: [id])
+  status    ClaimStatus @default(PENDING)
+  createdAt DateTime    @default(now())
+
+  @@schema("public")
+>>>>>>> 942a7b7 (updated):prisma/schema.prisma
 }

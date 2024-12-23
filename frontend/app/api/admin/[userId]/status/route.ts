@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { updateUserStatus } from '@/lib/db'
+import { updateUserStatus } from '@/app/database/db'
 
 export async function PUT(
   request: Request,

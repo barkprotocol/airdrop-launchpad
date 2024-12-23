@@ -28,7 +28,7 @@ import {
 import { Textarea } from '@/components/ui/textarea'
 import { createNewAirdrop } from '@/app/actions/create-airdrop'
 import { isValidSolanaAddress } from '@/lib/utils'
-import { getAirdropWalletBalance } from '@/lib/db'
+import { getAirdropWalletBalance } from '@/app/database/db'
 
 const formSchema = z.object({
   recipientAddress: z.string().refine(val => isValidSolanaAddress(val), {

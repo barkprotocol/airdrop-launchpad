@@ -9,7 +9,7 @@ import {
   getAirdropWalletBalance, 
   updateAirdropWalletBalance, 
   getAirdropWallet 
-} from '@/lib/db'
+} from '@/app/database/db'
 import { revalidatePath } from 'next/cache'
 import { CreateAirdropFormData } from '@/app/types/airdrop'
 
