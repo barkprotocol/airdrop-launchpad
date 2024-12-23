@@ -1,8 +1,8 @@
-# BARK | Token Sale & Airdrop Launchpad
+# BARK | Airdrop Launchpad
 
 ## Overview
 
-BARK Token Sale & Airdrop Launchpad is a decentralized application (dApp) built on the Solana blockchain that enables users to verify their eligibility and claim BARK tokens. This project leverages cutting-edge technologies like Next.js, TypeScript, and React while seamlessly integrating with Solana wallets to ensure an intuitive and secure user experience.
+BARK Protocol´s Airdrop Launchpad is a decentralized application (dApp) built on the Solana blockchain that enables users to verify their eligibility and claim BARK tokens. This project leverages cutting-edge technologies like Next.js, TypeScript, and React while seamlessly integrating with Solana wallets to ensure an intuitive and secure user experience.
 
 - **Frontend**: 
   - **Next.js**: For server-side rendering and static site generation.
@@ -12,7 +12,7 @@ BARK Token Sale & Airdrop Launchpad is a decentralized application (dApp) built 
   - **Solana Wallet Adapter**: For integrating popular Solana wallets like Phantom, Backpack, and Solflare.
   
 - **Backend**:
-  - **Admin Dasboard**: 
+  - **Admin Dashboard**: 
   - **Solana Blockchain**: For decentralized token transfers, eligibility checks, and interaction with the BARK ecosystem.
   - **Prisma ORM**: For seamless database interaction and data management.
   - **Helius API**: For interacting with the Solana blockchain to gather transaction data and process eligibility.
@@ -44,10 +44,6 @@ The eligibility check combines multiple sources:
 - Presence in the hardcoded `ELIGIBLE_ADDRESSES` array
 - Presence in the CSV whitelist
 - Having unclaimed BARK tokens in the database
-
-# Test eligibility checker / Whitelist
-
-**Test Address**: 9ZNTfG4NyQgxy2SWjSiQoUyBPEvXT2xo7fKc5hPYYJ7b
 
 ## Prerequisites
 

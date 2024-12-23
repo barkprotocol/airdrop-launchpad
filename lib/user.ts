@@ -1,4 +1,4 @@
-import prisma from '../app/database/db';
+import prisma from './db';
 
 // Function to get all users
 export async function getAllUsers() {
@@ -104,7 +104,7 @@ export async function createUserWithRole(data: { name: string; email: string; ro
 export async function updateUserAndStatus(id: string, data: { name?: string; email?: string; status: string }) {
   try {
     // Perform multiple operations inside a transaction
-    const result = await prisma.$transaction(async (prisma) => {
+    const result = await prisma.$transaction(async (prisma: { user: { update: (arg0: { where: { id: string; }; data: { name?: string; email?: string; status: string; }; }) => any; }; userStatus: { upsert: (arg0: { where: { userId: string; }; update: { status: string; }; create: { userId: string; status: string; }; }) => any; }; }) => {
       const user = await prisma.user.update({
         where: { id },
         data: {
@@ -132,7 +132,7 @@ export async function updateUserAndStatus(id: string, data: { name?: string; ema
 export async function deleteUserAndAssociatedData(id: string) {
   try {
     // Perform multiple delete operations inside a transaction
-    const result = await prisma.$transaction(async (prisma) => {
+    const result = await prisma.$transaction(async (prisma: { user: { delete: (arg0: { where: { id: string; }; }) => any; }; userStatus: { deleteMany: (arg0: { where: { userId: string; }; }) => any; }; role: { deleteMany: (arg0: { where: { userId: string; }; }) => any; }; }) => {
       const user = await prisma.user.delete({
         where: { id },
       });

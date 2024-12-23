@@ -1,6 +1,6 @@
 {
   "name": "launchpad",
-  "description": "BARK: Airdrop & Token Sale Launchpad is a decentralized application (dApp) built on the Solana blockchain that enables users to verify their eligibility and claim BARK tokens.",
+  "description": "BARK: Airdrop Launchpad is a decentralized application (dApp) built on the Solana blockchain that enables users to verify their eligibility and claim BARK tokens.",
   "version": "0.1.0",
   "author": "BARK Protocol",
   "types": "module",
