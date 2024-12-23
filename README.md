@@ -4,7 +4,7 @@
 
 BARK Protocol´s Airdrop Launchpad is a decentralized application (dApp) built on the Solana blockchain that enables users to verify their eligibility and claim BARK tokens. This project leverages cutting-edge technologies like Next.js, TypeScript, and React while seamlessly integrating with Solana wallets to ensure an intuitive and secure user experience.
 
-[WebUI/UX](/github/assets/frontend.png)
+![WebUI/UX](github/assets/frontend.png)
 
 - **Frontend**: 
   - **Next.js**: For server-side rendering and static site generation.
